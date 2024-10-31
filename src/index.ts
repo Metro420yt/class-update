@@ -29,7 +29,7 @@ export async function run() {
     }
 
 
-    const total = Object.values(stats).reduce((prv, cur) => prv += cur)
+    const total = Object.values(stats).reduce((total, num) => total += num, 0)
     setOutput('totalChanges', total)
     if (isDebug()) for (const file in stats) {
         debug(`${stats[file]} ${file}`)

@@ -1,5 +1,5 @@
-name: Node Class Update
-description: automatically update your discord classes
+name: Discord Class Updater
+description: automatically update discord class names
 branding:
   icon: file-plus
   color: blue

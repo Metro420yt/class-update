@@ -1,18 +1,9 @@
-# Class Updater
-- [Class Updater](#class-updater)
-- [Usage](#usage)
-  - [Inputs](#inputs)
-  - [Outputs](#outputs)
-  - [Credits](#credits)
-
-
-# Usage
 ## Inputs
 
 Add a step like this to your workflow:
 
 ```yml
-- uses: metro420yt/class-update@v1
+- uses: metro420yt/class-update@v1-rc
   with:
     # folder that has your theme files
     # Default: themes
@@ -40,7 +31,5 @@ The action provides these outputs:
 
 ---
 ## Credits
-<div style="color:gray">
-<p>inspired by <a href="https://github.com/Saltssaumure/ClassUpdate">ClassUpdate from Saltssaumure</a></p>
-<p>README.md based on <a href="https://github.com/EndBug/add-and-commit/blob/v9/README.md">EndBug/add-and-commit</a></p>
-</div>
+> - inspired by [ClassUpdate from Saltssaumure](https://github.com/Saltssaumure/ClassUpdate)
+> - README.md based on [EndBug/add-and-commit](https://github.com/EndBug/add-and-commit/blob/v9/README.md)

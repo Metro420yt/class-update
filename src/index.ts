@@ -28,14 +28,15 @@ export async function run() {
 
     }
 
-
     const total = Object.values(stats).reduce((total, num) => total += num, 0)
     setOutput('totalChanges', total)
-    if (isDebug()) for (const file in stats) {
-        debug(`${stats[file]} ${file}`)
-    }
 
-    files.forEach(([path, txt]) => writeFileSync(targetFolder + '/' + path, txt))
+    if (isDebug()) for (const file in stats) debug(`${stats[file]} ${file}`)
+
+    files.forEach(([path, txt]) => {
+        if (stats[path] > 0) writeFileSync(targetFolder + '/' + path, txt)
+    })
+
 }
 
 

@@ -1,0 +1,23 @@
+{
+  "name": "node-class-update",
+  "version": "1.0.0",
+  "description": "automatically update your discord classes",
+  "main": "prod/index.js",
+  "type": "module",
+  "author": "metro420",
+  "license": "ISC",
+  "scripts": {
+    "//dev": "nodemon -e .ts --exec \"tsc\"",
+    "build": "ncc build src/index.ts --minify",
+    "dev": "ncc build src/index.ts --watch"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.4",
+    "@vercel/ncc": "^0.38.2",
+    "nodemon": "^3.1.7",
+    "typescript": "^5.6.3"
+  }
+}

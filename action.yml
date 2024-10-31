@@ -1,0 +1,21 @@
+name: Node Class Update
+description: automatically update your discord classes
+
+inputs:
+  folder:
+    description: folder that has your theme files
+    default: themes
+  ext:
+    description: file extension to target
+    default: css
+  diff:
+    description: url or relative path to a file containing an old&new pair of class names
+    default: https://raw.githubusercontent.com/SyndiShanX/Update-Classes/main/Changes.txt
+
+outputs:
+  totalChanges:
+    description: the total number of classes that were replaced
+    
+runs:
+  using: node20
+  main: dist/index.js

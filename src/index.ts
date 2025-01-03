@@ -7,38 +7,34 @@ var __root = import.meta.dirname.split('/').slice(0, -1).join('/')
 const keys = ['ext', 'folder', 'diff'] as const
 const options = Object.fromEntries(keys.map(k => [k, getInput(k)])) as Record<(typeof keys)[number], string>
 
-run()
-export async function run() {
-    const pairs = await getPairs(options.diff)
+const pairs = await getPairs(options.diff)
 
-    const targetFolder = process.cwd() + '/' + options.folder
-    if (!existsSync(targetFolder)) throw `folder doesnt exist: ${options.folder} (${targetFolder})`
-    const files = getFiles(targetFolder)
+const targetFolder = process.cwd() + '/' + options.folder
+if (!existsSync(targetFolder)) throw `folder doesnt exist: ${options.folder} (${targetFolder})`
+const files = getFiles(targetFolder)
 
-    const stats: { [key: string]: number } = {}
-    for (const [oldClass, newClass] of pairs) {
-        for (let i = 0; files.length > i; i++) {
-            const fileName = files[i][0]
-            files[i][1] = files[i][1].replaceAll(oldClass, () => {
-                if (stats[fileName]) stats[fileName]++
-                else stats[fileName] = 1
+
+const stats: { [key: string]: number } = {}
+for (const [oldClass, newClass] of pairs) {
+    for (let i = 0; files.length > i; i++) {
+        files[i].txt = files[i].txt
+            .replaceAll(oldClass, () => {
+                if (stats[files[i].file]) stats[files[i].file]++
+                else stats[files[i].file] = 1
+
                 return newClass
             })
-        }
-
     }
-
-    const total = Object.values(stats).reduce((total, num) => total += num, 0)
-    setOutput('totalChanges', total)
-
-    if (isDebug()) for (const file in stats) debug(`${stats[file]} ${file}`)
-
-    files.forEach(([path, txt]) => {
-        if (stats[path] > 0) writeFileSync(targetFolder + '/' + path, txt)
-    })
-
 }
 
+const total = Object.values(stats).reduce((total, num) => total += num, 0)
+setOutput('totalChanges', total)
+
+if (isDebug()) for (const file in stats) debug(`${stats[file]} ${file}`)
+
+files.forEach(({ file, txt }) => {
+    if (stats[file] > 0) writeFileSync(targetFolder + '/' + file, txt)
+})
 
 
 
@@ -71,5 +67,5 @@ function getFiles(path: string) {
         .filter((f: string) => f.endsWith(options.ext))
     debug(`found ${files.length} files`)
 
-    return files.map(f => [f, readFileSync(path + '/' + f, 'utf8')]) as Array<[string, string]>
+    return files.map(f => ({ file: f, txt: readFileSync(path + '/' + f, 'utf8') })) as Array<{ file: string, txt: string }>
 }

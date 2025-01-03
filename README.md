@@ -70,13 +70,9 @@ jobs:
 
 
 im using [make.com](https://make.com) since they have a free tier, but this can be without them if needed
-<details>
-<summary> blueprint if using make.com</summary>
 
-> make sure to set up a schedule, i wouldnt try and make it run more than once per hour
-
-<script src="https://gist.github.com/Metro420yt/a3cc2687adb2313966c2f339bd43d246.js"></script>
-</details>
+[make.com blueprint](https://gist.github.com/Metro420yt/a3cc2687adb2313966c2f339bd43d246#file-make-blueprint-json)
+> make sure to set up a schedule, i wouldnt try and make it run more than once per hour to stay under the 1000 operations/month
 </details>
 
 <br>

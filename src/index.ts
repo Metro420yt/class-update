@@ -1,7 +1,8 @@
 import { debug, getInput, isDebug, setOutput } from '@actions/core'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { dirname, join } from 'path'
 
-var __root = import.meta.dirname.split('/').slice(0, -1).join('/')
+var __root = dirname(import.meta.dirname)
 
 
 const keys = ['ext', 'folder', 'diff'] as const
@@ -9,7 +10,7 @@ const options = Object.fromEntries(keys.map(k => [k, getInput(k)])) as Record<(t
 
 const pairs = await getPairs(options.diff)
 
-const targetFolder = process.cwd() + '/' + options.folder
+const targetFolder = join(process.cwd(), options.folder)
 if (!existsSync(targetFolder)) throw `folder doesnt exist: ${options.folder} (${targetFolder})`
 const files = getFiles(targetFolder)
 
@@ -33,7 +34,7 @@ setOutput('totalChanges', total)
 if (isDebug()) for (const file in stats) debug(`${stats[file]} ${file}`)
 
 files.forEach(({ file, txt }) => {
-    if (stats[file] > 0) writeFileSync(targetFolder + '/' + file, txt)
+    if (stats[file] > 0) writeFileSync(join(targetFolder, file), txt)
 })
 
 
@@ -46,7 +47,7 @@ async function getPairs(diffSource: string): Promise<Array<[string, string]>> {
         if (!resp.ok) throw 'bad response'
         file = await resp.text()
     }
-    else if (existsSync(__root + '/' + diffSource)) file = readFileSync(__root + '/' + diffSource, 'utf8')
+    else if (existsSync(join(__root, diffSource))) file = readFileSync(join(__root, diffSource), 'utf8')
     else throw 'invalid diff value'
 
     const split = file.split('\n')
@@ -67,5 +68,5 @@ function getFiles(path: string) {
         .filter((f: string) => f.endsWith(options.ext))
     debug(`found ${files.length} files`)
 
-    return files.map(f => ({ file: f, txt: readFileSync(path + '/' + f, 'utf8') })) as Array<{ file: string, txt: string }>
+    return files.map(f => ({ file: f, txt: readFileSync(join(path, f), 'utf8') })) as Array<{ file: string, txt: string }>
 }

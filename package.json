@@ -1,5 +1,5 @@
 {
-  "name": "node-class-update",
+  "name": "discord-class-update",
   "version": "1.0.0",
   "description": "automatically update your discord classes",
   "main": "prod/index.js",
@@ -7,9 +7,9 @@
   "author": "metro420",
   "license": "ISC",
   "scripts": {
-    "//dev": "nodemon -e .ts --exec \"tsc\"",
+    "dev": "nodemon -e .ts --exec \"tsc\"",
     "build": "ncc build src/index.ts --minify",
-    "dev": "ncc build src/index.ts --watch"
+    "build:w": "ncc build src/index.ts --watch --minify"
   },
   "dependencies": {
     "@actions/core": "^1.11.1"

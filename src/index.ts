@@ -1,20 +1,35 @@
-import { debug, getInput, isDebug, setOutput } from '@actions/core'
+import { debug, error, ExitCode, getInput, isDebug, setOutput } from '@actions/core'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 
 var __root = dirname(import.meta.dirname)
+const doDebug = isDebug()
+
+const options = {
+    folder: 'themes',
+    ext: 'css',
+    diff: 'https://raw.githubusercontent.com/SyndiShanX/Update-Classes/main/Changes.txt'
+} satisfies Record<string, string>
+
+for (const key in options) {
+    const value = getInput(key) as string
+    if (value) options[key as keyof typeof options] = value
+}
+
+if (!options.ext.startsWith('.')) options.ext = '.' + options.ext
 
 
-const keys = ['ext', 'folder', 'diff'] as const
-const options = Object.fromEntries(keys.map(k => [k, getInput(k)])) as Record<(typeof keys)[number], string>
 
-const pairs = await getPairs(options.diff)
-
-const targetFolder = join(process.cwd(), options.folder)
-if (!existsSync(targetFolder)) throw `folder doesnt exist: ${options.folder} (${targetFolder})`
+const targetFolder = join(process.cwd(), options.folder) // [ ]: maybe do resolve()
+debug(`target: ${targetFolder}`)
+if (!existsSync(targetFolder)) {
+    error(`folder doesnt exist ${options.folder} (${targetFolder})`)
+    process.exit(ExitCode.Failure)
+}
 const files = getFiles(targetFolder)
 
 
+const pairs = await getPairs(options.diff)
 const stats: { [key: string]: number } = {}
 for (const [oldClass, newClass] of pairs) {
     for (let i = 0; files.length > i; i++) {
@@ -31,7 +46,10 @@ for (const [oldClass, newClass] of pairs) {
 const total = Object.values(stats).reduce((total, num) => total += num, 0)
 setOutput('totalChanges', total)
 
-if (isDebug()) for (const file in stats) debug(`${stats[file]} ${file}`)
+if (doDebug) {
+    debug(`${total} changes`)
+    for (const file in stats) debug(`  ${stats[file]} ${file}`)
+}
 
 files.forEach(({ file, txt }) => {
     if (stats[file] > 0) writeFileSync(join(targetFolder, file), txt)
@@ -40,15 +58,24 @@ files.forEach(({ file, txt }) => {
 
 
 async function getPairs(diffSource: string): Promise<Array<[string, string]>> {
-    debug('Getting diff source...')
     var file: string
     if (diffSource.startsWith('http')) {
+        debug(`fetching diff: ${diffSource}`)
         const resp = await fetch(diffSource)
-        if (!resp.ok) throw 'bad response'
+        if (!resp.ok) {
+            error(`bad response\n  ${resp.status} ${resp.url}`)
+            process.exit(ExitCode.Failure)
+        }
         file = await resp.text()
     }
-    else if (existsSync(join(__root, diffSource))) file = readFileSync(join(__root, diffSource), 'utf8')
-    else throw 'invalid diff value'
+    else if (existsSync(join(__root, diffSource))) {
+        debug('Using local diff source')
+        file = readFileSync(join(__root, diffSource), 'utf8')
+    }
+    else {
+        error(`invalid diff value: ${diffSource}`)
+        process.exit(ExitCode.Failure)
+    }
 
     const split = file.split('\n')
 
@@ -66,7 +93,9 @@ async function getPairs(diffSource: string): Promise<Array<[string, string]>> {
 function getFiles(path: string) {
     const files = (readdirSync(path, { recursive: true }) as string[])
         .filter((f: string) => f.endsWith(options.ext))
+
     debug(`found ${files.length} files`)
+    if (doDebug) files.forEach(f => debug('  ' + f))
 
     return files.map(f => ({ file: f, txt: readFileSync(join(path, f), 'utf8') })) as Array<{ file: string, txt: string }>
 }
